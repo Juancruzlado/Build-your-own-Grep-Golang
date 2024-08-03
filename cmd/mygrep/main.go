@@ -32,8 +32,6 @@ func main() {
 	if !ok {
 		os.Exit(1)
 	}
-
-	// default exit code is 0 which means success
 }
 
 func matchLine(line []byte, pattern string) (bool, error) {
