@@ -1,14 +1,14 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"unicode/utf8"
 )
 
-// Usage: echo <input_text> | your_program.sh -E <pattern>
+// Usage: echo <input_text> | ./your_program.sh -E <pattern>
 func main() {
 	if len(os.Args) < 3 || os.Args[1] != "-E" {
 		fmt.Fprintf(os.Stderr, "usage: mygrep -E <pattern>\n")
@@ -41,18 +41,13 @@ func matchLine(line []byte, pattern string) (bool, error) {
 		return false, fmt.Errorf("unsupported pattern: %q", pattern)
 	}
 
-	var ok bool
-
-	// You can use print statements as follows for debugging, they'll be visible when running tests.
-	fmt.Println("Logs from your program will appear here!")
-
-	// Uncomment this to pass the first stage
-	ok = bytes.ContainsAny(line, pattern)
-	if pattern == "\\d" {
-		ok = bytes.ContainsAny(line, "1234567890")
-	} else {
-		ok = bytes.ContainsAny(line, pattern)
+	// Compile the regular expression
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		return false, fmt.Errorf("invalid pattern: %v", err)
 	}
 
+	// Check if the line matches the regular expression
+	ok := re.Match(line)
 	return ok, nil
 }
